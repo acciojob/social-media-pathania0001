@@ -8,7 +8,6 @@ import {
   useHistory,
 } from "react-router-dom";
 
-// Initial fake data
 const initialUsers = [
   { id: "u1", name: "Alice" },
   { id: "u2", name: "Bob" },
@@ -49,7 +48,7 @@ function App() {
     setPosts((prev) =>
       prev.map((p) => {
         if (p.id !== postId) return p;
-        if (index === 4) return p; // lock 5th reaction
+        if (index === 4) return p;
         const newReactions = [...p.reactions];
         newReactions[index] = newReactions[index] + 1;
         return { ...p, reactions: newReactions };
@@ -92,9 +91,10 @@ function App() {
                 />
               )}
             />
+            <Route exact path="/users" render={() => <UsersPage users={users} />} />
             <Route
-              path="/users"
-              render={() => <UsersPage users={users} posts={posts} />}
+              path="/users/:userId"
+              render={() => <UserDetails users={users} posts={posts} />}
             />
             <Route
               path="/notifications"
@@ -226,38 +226,47 @@ function CreatePostForm({ users, addPost }) {
   );
 }
 
-function UsersPage({ users, posts }) {
-  const [selectedUserId, setSelectedUserId] = useState(null);
-
+function UsersPage({ users }) {
   return (
     <section>
       <h2>Users</h2>
       <ul>
         {users.map((u) => (
-          <li key={u.id} onClick={() => setSelectedUserId(u.id)}>
-            {u.name}
+          <li key={u.id}>
+            <Link to={`/users/${u.id}`}>{u.name}</Link>
           </li>
         ))}
       </ul>
+    </section>
+  );
+}
 
-      {selectedUserId && (
-        <div>
-          <h3>User Posts</h3>
-          {posts.filter((p) => p.authorId === selectedUserId).map((p) => (
-            <article
-              key={p.id}
-              className="post"
-              style={{ border: "1px solid #ccc", padding: 8, margin: 8 }}
-            >
-              <h4>{p.title}</h4>
-              <p>{p.content}</p>
-            </article>
-          ))}
-          {posts.filter((p) => p.authorId === selectedUserId).length === 0 && (
-            <p>No posts</p>
-          )}
-        </div>
+function UserDetails({ users, posts }) {
+  const { userId } = useParams();
+  const user = users.find((u) => u.id === userId);
+  const userPosts = posts.filter((p) => p.authorId === userId);
+
+  if (!user) return <p>User not found</p>;
+
+  return (
+    <section>
+      <h2>{user.name}</h2>
+      <h3>Posts by {user.name}</h3>
+      {userPosts.length > 0 ? (
+        userPosts.map((p) => (
+          <article
+            key={p.id}
+            className="post"
+            style={{ border: "1px solid #ccc", padding: 8, margin: 8 }}
+          >
+            <h4>{p.title}</h4>
+            <p>{p.content}</p>
+          </article>
+        ))
+      ) : (
+        <p>No posts</p>
       )}
+      <Link to="/users">Back to Users</Link>
     </section>
   );
 }
