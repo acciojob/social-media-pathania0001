@@ -54,11 +54,10 @@ function App() {
           <h1>GenZ</h1>
         </header>
 
-        <nav>
-  <a href="/">Posts</a>
-  <a href="/users">Users</a>
-  <a href="/notifications">Notifications</a>
-</nav>
+         <Link to="/">Posts</Link> |{" "}
+          <Link to="/users">Users</Link> |{" "}
+          <Link to="/notifications">Notifications</Link>
+
         <main style={{ marginTop: 20 }}>
           <Switch>
             <Route
