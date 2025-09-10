@@ -248,7 +248,7 @@ function PostDetails({ posts, updatePost, users, addReaction }) {
   };
 
   return (
-    <section>
+    <section className="post">
       <article className="post" style={{ border: "1px solid #aaa", padding: 12 }}>
         {!editing ? (
           <>
