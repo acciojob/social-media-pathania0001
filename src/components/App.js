@@ -1,19 +1,35 @@
 import React, { useState } from "react";
-import { BrowserRouter as Router, Switch, Route, useHistory, Link } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  useParams,
+  useHistory,
+} from "react-router-dom";
 
-
-// Single-file React app that satisfies the Cypress-style requirements described.
-// Export default App component.
-
+// Initial fake data
 const initialUsers = [
-  { id: 'u1', name: 'Alice' },
-  { id: 'u2', name: 'Bob' },
-  { id: 'u3', name: 'Charlie' },
+  { id: "u1", name: "Alice" },
+  { id: "u2", name: "Bob" },
+  { id: "u3", name: "Charlie" },
 ];
 
 const initialPosts = [
-  { id: 'p1', title: 'Hello world', content: 'This is my first post', authorId: 'u1', reactions: [0,0,0,0,0] },
-  { id: 'p2', title: 'Another day', content: 'React is fun', authorId: 'u2', reactions: [0,0,0,0,0] },
+  {
+    id: "p1",
+    title: "Hello world",
+    content: "This is my first post",
+    authorId: "u1",
+    reactions: [0, 0, 0, 0, 0],
+  },
+  {
+    id: "p2",
+    title: "Another day",
+    content: "React is fun",
+    authorId: "u2",
+    reactions: [0, 0, 0, 0, 0],
+  },
 ];
 
 function App() {
@@ -21,7 +37,9 @@ function App() {
   const [posts, setPosts] = useState(initialPosts);
   const [notifications, setNotifications] = useState([]);
 
-  const addPost = (post) => setPosts((prev) => [post, ...prev]);
+  const addPost = (post) => {
+    setPosts((prev) => [post, ...prev]);
+  };
 
   const updatePost = (id, updated) => {
     setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, ...updated } : p)));
@@ -31,9 +49,9 @@ function App() {
     setPosts((prev) =>
       prev.map((p) => {
         if (p.id !== postId) return p;
-        if (index === 4) return p; // locked
+        if (index === 4) return p; // lock 5th reaction
         const newReactions = [...p.reactions];
-        newReactions[index]++;
+        newReactions[index] = newReactions[index] + 1;
         return { ...p, reactions: newReactions };
       })
     );
@@ -46,7 +64,6 @@ function App() {
     ]);
   };
 
-
   return (
     <Router>
       <div className="App" style={{ padding: 20 }}>
@@ -54,9 +71,12 @@ function App() {
           <h1>GenZ</h1>
         </header>
 
-         <Link to="/">Posts</Link> |{" "}
+        {/* nav with <Link>, renders <a> in DOM */}
+        <nav>
+          <Link to="/">Posts</Link> |{" "}
           <Link to="/users">Users</Link> |{" "}
           <Link to="/notifications">Notifications</Link>
+        </nav>
 
         <main style={{ marginTop: 20 }}>
           <Switch>
@@ -102,20 +122,23 @@ function App() {
     </Router>
   );
 }
+
 function PostsPage({ posts, users, addReaction, addPost }) {
   return (
-    <section className="post">
-      {/* posts-list container must exist */}
+    <section>
       <div className="posts-list">
-        {/* first child: simple header element to ensure :nth-child(2) will be first post */}
         <div>Posts list header</div>
-
-        {/* second child onward: individual post items (we render them in order so newest post appears as :nth-child(2)) */}
-        {posts.map(post => (
-          <article key={post.id} className="post" style={{ border: '1px solid #ddd', padding: 8, margin: 8 }}>
+        {posts.map((post) => (
+          <article
+            key={post.id}
+            className="post"
+            style={{ border: "1px solid #ddd", padding: 8, margin: 8 }}
+          >
             <h3>{post.title}</h3>
             <p>{post.content}</p>
-            <div>Author: {users.find(u => u.id === post.authorId)?.name || 'Unknown'}</div>
+            <div>
+              Author: {users.find((u) => u.id === post.authorId)?.name || "Unknown"}
+            </div>
 
             <div className="reactions">
               {post.reactions.map((count, idx) => (
@@ -125,58 +148,77 @@ function PostsPage({ posts, users, addReaction, addPost }) {
               ))}
             </div>
 
-            {/* View (button) must be .button inside .post and navigate to /posts/:id */}
-            <a className="button" href={`/posts/${post.id}`}>View</a>
-
+            {/* navigate with Link */}
+            <Link className="button" to={`/posts/${post.id}`}>
+              View
+            </Link>
           </article>
         ))}
       </div>
 
       <hr />
-
       <CreatePostForm users={users} addPost={addPost} />
     </section>
   );
 }
 
 function CreatePostForm({ users, addPost }) {
-  const [title, setTitle] = useState('');
-  const [authorId, setAuthorId] = useState(users[0]?.id || '');
-  const [content, setContent] = useState('');
+  const [title, setTitle] = useState("");
+  const [authorId, setAuthorId] = useState(users[0]?.id || "");
+  const [content, setContent] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!title) return;
     const newPost = {
-      id: 'p_' + Math.random().toString(36).slice(2,9),
+      id: "p_" + Math.random().toString(36).slice(2, 9),
       title,
       content,
       authorId,
-      reactions: [0,0,0,0,0],
+      reactions: [0, 0, 0, 0, 0],
     };
     addPost(newPost);
-    setTitle('');
-    setContent('');
+    setTitle("");
+    setContent("");
   };
 
   return (
     <form onSubmit={handleSubmit} style={{ marginTop: 16 }}>
       <h2>Create Post</h2>
       <div>
-        <label>Title</label><br />
-        <input id="postTitle" value={title} onChange={e => setTitle(e.target.value)} />
+        <label>Title</label>
+        <br />
+        <input
+          id="postTitle"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
       </div>
 
       <div>
-        <label>Author</label><br />
-        <select id="postAuthor" value={authorId} onChange={e => setAuthorId(e.target.value)}>
-          {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
+        <label>Author</label>
+        <br />
+        <select
+          id="postAuthor"
+          value={authorId}
+          onChange={(e) => setAuthorId(e.target.value)}
+        >
+          {users.map((u) => (
+            <option key={u.id} value={u.id}>
+              {u.name}
+            </option>
+          ))}
         </select>
       </div>
 
       <div>
-        <label>Content</label><br />
-        <textarea id="postContent" value={content} onChange={e => setContent(e.target.value)} />
+        <label>Content</label>
+        <br />
+        <textarea
+          id="postContent"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+        />
       </div>
 
       <button type="submit">Add Post</button>
@@ -191,25 +233,31 @@ function UsersPage({ users, posts }) {
     <section>
       <h2>Users</h2>
       <ul>
-        {users.map((u, idx) => (
-          <li key={u.id} onClick={() => setSelectedUserId(u.id)}>{u.name}</li>
+        {users.map((u) => (
+          <li key={u.id} onClick={() => setSelectedUserId(u.id)}>
+            {u.name}
+          </li>
         ))}
       </ul>
 
-      <div>
-        {selectedUserId && (
-          <div>
-            <h3>User Posts</h3>
-            {posts.filter(p => p.authorId === selectedUserId).map(p => (
-              <article key={p.id} className="post" style={{ border: '1px solid #ccc', padding: 8, margin: 8 }}>
-                <h4>{p.title}</h4>
-                <p>{p.content}</p>
-              </article>
-            ))}
-            {posts.filter(p => p.authorId === selectedUserId).length === 0 && <p>No posts</p>}
-          </div>
-        )}
-      </div>
+      {selectedUserId && (
+        <div>
+          <h3>User Posts</h3>
+          {posts.filter((p) => p.authorId === selectedUserId).map((p) => (
+            <article
+              key={p.id}
+              className="post"
+              style={{ border: "1px solid #ccc", padding: 8, margin: 8 }}
+            >
+              <h4>{p.title}</h4>
+              <p>{p.content}</p>
+            </article>
+          ))}
+          {posts.filter((p) => p.authorId === selectedUserId).length === 0 && (
+            <p>No posts</p>
+          )}
+        </div>
+      )}
     </section>
   );
 }
@@ -218,14 +266,13 @@ function NotificationsPage({ notifications, refreshNotifications }) {
   return (
     <section>
       <h2>Notifications</h2>
-      <button className="button" onClick={refreshNotifications}>Refresh Notifications</button>
+      <button className="button" onClick={refreshNotifications}>
+        Refresh Notifications
+      </button>
 
       <section className="notificationsList" style={{ marginTop: 12 }}>
-        {notifications.length === 0 ? null : (
-          <div>
-            {notifications.map(n => <div key={n.id}>{n.text}</div>)}
-          </div>
-        )}
+        {notifications.length > 0 &&
+          notifications.map((n) => <div key={n.id}>{n.text}</div>)}
       </section>
     </section>
   );
@@ -235,7 +282,6 @@ function PostDetails({ posts, updatePost, users, addReaction }) {
   const { postId } = useParams();
   const history = useHistory();
   const post = posts.find((p) => p.id === postId);
-
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState(post?.title || "");
   const [content, setContent] = useState(post?.content || "");
@@ -248,7 +294,7 @@ function PostDetails({ posts, updatePost, users, addReaction }) {
   };
 
   return (
-    <section className="post">
+    <section>
       <article className="post" style={{ border: "1px solid #aaa", padding: 12 }}>
         {!editing ? (
           <>
