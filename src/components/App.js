@@ -46,7 +46,7 @@ function App() {
     ]);
   };
 
-  
+
   return (
     <Router>
       <div className="App" style={{ padding: 20 }}>
@@ -104,7 +104,7 @@ function App() {
 }
 function PostsPage({ posts, users, addReaction, addPost }) {
   return (
-    <section>
+    <section className="post">
       {/* posts-list container must exist */}
       <div className="posts-list">
         {/* first child: simple header element to ensure :nth-child(2) will be first post */}
