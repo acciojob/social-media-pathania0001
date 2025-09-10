@@ -91,7 +91,11 @@ function App() {
                 />
               )}
             />
-            <Route exact path="/users" render={() => <UsersPage users={users} />} />
+            <Route
+              exact
+              path="/users"
+              render={() => <UsersPage users={users} />}
+            />
             <Route
               path="/users/:userId"
               render={() => <UserDetails users={users} posts={posts} />}
@@ -251,7 +255,7 @@ function UserDetails({ users, posts }) {
   return (
     <section>
       <h2>{user.name}</h2>
-      <h3>Posts by {user.name}</h3>
+      <h3>User Posts</h3>
       {userPosts.length > 0 ? (
         userPosts.map((p) => (
           <article
@@ -266,7 +270,6 @@ function UserDetails({ users, posts }) {
       ) : (
         <p>No posts</p>
       )}
-      <Link to="/users">Back to Users</Link>
     </section>
   );
 }
@@ -354,6 +357,5 @@ function PostDetails({ posts, updatePost, users, addReaction }) {
     </section>
   );
 }
-
 
 export default App;
