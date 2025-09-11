@@ -346,5 +346,4 @@ function PostDetails({ posts, updatePost, users, addReaction }) {
   );
 }
 
-
 export default App;
